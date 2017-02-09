@@ -20,7 +20,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var moustacheImage: UIImageView!
     
     required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        super.init(coder: aDecoder)!
     }
     
     override func didReceiveMemoryWarning() {
@@ -35,83 +35,82 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     // MARK: - Gesture Action
     
-    @IBAction func move(recognizer: UIPanGestureRecognizer) {
+    @IBAction func move(_ recognizer: UIPanGestureRecognizer) {
         //return
-        let translation = recognizer.translationInView(self.view)
+        let translation = recognizer.translation(in: self.view)
         recognizer.view!.center = CGPoint(x:recognizer.view!.center.x + translation.x,
             y:recognizer.view!.center.y + translation.y)
-        recognizer.setTranslation(CGPointZero, inView: self.view)
+        recognizer.setTranslation(CGPoint.zero, in: self.view)
     }
     
-    @IBAction func pinch(recognizer: UIPinchGestureRecognizer) {
-        recognizer.view!.transform = CGAffineTransformScale(recognizer.view!.transform,
-            recognizer.scale, recognizer.scale)
+    @IBAction func pinch(_ recognizer: UIPinchGestureRecognizer) {
+        recognizer.view!.transform = recognizer.view!.transform.scaledBy(x: recognizer.scale, y: recognizer.scale)
         recognizer.scale = 1
     }
     
-    @IBAction func rotate(recognizer: UIRotationGestureRecognizer) {
-        recognizer.view!.transform = CGAffineTransformRotate(recognizer.view!.transform, recognizer.rotation)
+    @IBAction func rotate(_ recognizer: UIRotationGestureRecognizer) {
+        recognizer.view!.transform = recognizer.view!.transform.rotated(by: recognizer.rotation)
         recognizer.rotation = 0
 
     }
     
     // MARK: - Menu Action
     
-    @IBAction func openCamera(sender: AnyObject) {
+    @IBAction func openCamera(_ sender: AnyObject) {
         openPhoto()
     }
     
-    @IBAction func hideShowHat(sender: AnyObject) {
-        hatImage.hidden = !hatImage.hidden
+    @IBAction func hideShowHat(_ sender: AnyObject) {
+        hatImage.isHidden = !hatImage.isHidden
     }
     
-    @IBAction func hideShowGlasses(sender: AnyObject) {
-        glassesImage.hidden = !glassesImage.hidden
+    @IBAction func hideShowGlasses(_ sender: AnyObject) {
+        glassesImage.isHidden = !glassesImage.isHidden
     }
     
-    @IBAction func hideShowMoustache(sender: AnyObject) {
-        moustacheImage.hidden = !moustacheImage.hidden
+    @IBAction func hideShowMoustache(_ sender: AnyObject) {
+        moustacheImage.isHidden = !moustacheImage.isHidden
     }
     
-    @IBAction func share(sender: AnyObject) {
+    @IBAction func share(_ sender: AnyObject) {
         // TODO: your turn to code it!
     }
 
     // MARK: - UIImagePickerControllerDelegate
     
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [NSObject : AnyObject]) {
-        imagePicker.dismissViewControllerAnimated(true, completion: nil)
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [AnyHashable: Any]) {
+        imagePicker.dismiss(animated: true, completion: nil)
         imageView.image = info[UIImagePickerControllerOriginalImage] as? UIImage
     }
     
     // MARK: - UIGestureRecognizerDelegate
     
-    func gestureRecognizer(UIGestureRecognizer,
-        shouldRecognizeSimultaneouslyWithGestureRecognizer:UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(_: UIGestureRecognizer,
+        _ shouldRecognizeSimultaneouslyWithGestureRecognizer:UIGestureRecognizer) -> Bool {
             return true
     }
     
     // MARK: - Private functions
     
-    private func openPhoto() {
-        imagePicker.sourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum
+    fileprivate func openPhoto() {
+        imagePicker.sourceType = UIImagePickerControllerSourceType.savedPhotosAlbum
         imagePicker.delegate = self
-        presentViewController(imagePicker, animated: true, completion: nil)
+        present(imagePicker, animated: true, completion: nil)
     }
     
-    func presentAlert(title: String, message: String) {
-        var alert = UIAlertController(title: title, message: message, preferredStyle: .Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)
+    func presentAlert(_ title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
-    func snapshot() -> NSData {
+    func snapshot() -> Data {
         UIGraphicsBeginImageContext(self.view.frame.size)
-        self.view.layer.renderInContext(UIGraphicsGetCurrentContext())
+        self.view.layer.render(in: UIGraphicsGetCurrentContext()!)
         let fullScreenshot = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        UIImageWriteToSavedPhotosAlbum(fullScreenshot, nil, nil, nil)
-        return UIImageJPEGRepresentation(fullScreenshot, 0.5)
+        UIImageWriteToSavedPhotosAlbum(fullScreenshot!, nil, nil, nil)
+        return UIImageJPEGRepresentation(fullScreenshot!, 0.5)!
     }
 
 }
