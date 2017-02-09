@@ -7,7 +7,7 @@
 //
 
 import UIKit
-// TODO add import
+import AeroGearOAuth2
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -40,6 +40,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    }
+    
+    func application(_ application: UIApplication, handleOpen url: URL) -> Bool {
+        let notification = NSNotification(name: NSNotification.Name(rawValue: AGAppLaunchedWithURLNotification),
+                                          object:nil,
+                                          userInfo:[UIApplicationLaunchOptionsKey.url:url])
+        NotificationCenter.default.post(notification as Notification)
+        return true
+    }
+    
+    func application(application: UIApplication,
+                     openURL url: NSURL,
+                     sourceApplication: String?,
+                     annotation: AnyObject?) -> Bool {
+        let notification = NSNotification(name: NSNotification.Name(rawValue: AGAppLaunchedWithURLNotification),
+                                          object:nil,
+                                          userInfo:[UIApplicationLaunchOptionsKey.url:url])
+        NotificationCenter.default.post(notification as Notification)
+        return true
     }
 
 
