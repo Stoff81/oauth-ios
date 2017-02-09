@@ -9,10 +9,13 @@
 import UIKit
 import MobileCoreServices
 import AssetsLibrary
+import AeroGearHttp
+import AeroGearOAuth2
 
 // TODO add import
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIGestureRecognizerDelegate {
+    var http: Http!
     var imagePicker = UIImagePickerController()
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var hatImage: UIImageView!
@@ -31,6 +34,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     // TODO add http instance
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.http = Http()
     }
     
     // MARK: - Gesture Action
@@ -73,7 +77,30 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     @IBAction func share(_ sender: AnyObject) {
-        // TODO: your turn to code it!
+        let googleConfig = GoogleConfig(
+            clientId: "430194645067-odvpsj61uocskiqhtfpin9m81fut8f95.apps.googleusercontent.com",
+            scopes:["https://www.googleapis.com/auth/drive"])                // [2] Specify scope
+        
+        let gdModule = AccountManager.addGoogleAccount(config: googleConfig)     // [3] Add it to AccountManager
+        self.http.authzModule = gdModule                                 // [4] Inject the AuthzModule
+        // into the HTTP layer object
+        
+        let multipartData = MultiPartData(data: self.snapshot(),         // [5] Define multi-part
+            name: "image",
+            filename: "incognito_photo",
+            mimeType: "image/jpg")
+        let multipartArray =  ["file": multipartData]
+        
+        self.http.request(method: .post,
+                          path: "https://www.googleapis.com/upload/drive/v2/files",
+                          parameters: multipartArray,
+                          completionHandler: {(response, error) in
+                            if (error != nil) {
+                                self.presentAlert("Error", message: error!.localizedDescription)
+                            } else {
+                                self.presentAlert("Success", message: "Successfully uploaded!")
+                            }
+                        })
     }
 
     // MARK: - UIImagePickerControllerDelegate
